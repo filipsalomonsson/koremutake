@@ -20,9 +20,8 @@ def encode(num, syllables=None):
     if num == 0:
         parts.append(_syllables[0])
     while num:
-        num, remainder = divmod(num, 128)
-        parts.append(_syllables[remainder])
-
+        parts.append(_syllables[num & 127])
+        num = num >> 7
     if syllables is not None and len(parts) < syllables:
         parts.extend([_syllables[0]] * (syllables - len(parts)))
     return ''.join(reversed(parts))
