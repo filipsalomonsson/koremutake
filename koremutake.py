@@ -20,11 +20,11 @@ def encode(num, syllables=None):
     if num == 0:
         parts.append(_syllables[0])
     while num:
-        parts.append(_syllables[num & 127])
+        parts.insert(0, _syllables[num & 127])
         num = num >> 7
     if syllables is not None and len(parts) < syllables:
-        parts.extend([_syllables[0]] * (syllables - len(parts)))
-    return ''.join(reversed(parts))
+        parts[0:0] = [_syllables[0]] * (syllables - len(parts))
+    return ''.join(parts)
 
 _koremutake_re = re.compile(r"^(%s)+$" % "|".join(_syllables))
 _syllable_re = re.compile(r"(%s)" % "|".join(_syllables))
