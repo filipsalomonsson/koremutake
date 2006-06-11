@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import unittest
-import re
 
 __author__ = "Filip Salomonsson (filip@infix.se)"
 __date__ = "2006-06-11"
@@ -9,6 +8,7 @@ __date__ = "2006-06-11"
 _vowels = "aeiouy"
 _consonants = list("bdfghjklmnprstv") + "br dr fr gr pr st tr".split()
 _syllables = [c + v for c in _consonants for v in _vowels][:128]
+_revmap = dict([(v, k) for (k, v) in enumerate(_syllables)])
 
 def encode(num, syllables=None):
     """Converts a number to a koremutake string.
@@ -26,16 +26,19 @@ def encode(num, syllables=None):
         parts[0:0] = [_syllables[0]] * (syllables - len(parts))
     return ''.join(parts)
 
-_koremutake_re = re.compile(r"^(%s)+$" % "|".join(_syllables))
-_syllable_re = re.compile(r"(%s)" % "|".join(_syllables))
-def decode(s):
-    if not _koremutake_re.match(s):
-        raise ValueError("Argument is not a valid koremutake string.")
+def decode(string):
     num = 0
-    for syllable in _syllable_re.findall(s):
-        num <<= 7
-        num += _syllables.index(syllable)
+    i = 0
+    try:
+        for (j, char) in enumerate(string):
+            if char in _vowels:
+                num <<= 7
+                num += _revmap[string[i:j+1]]
+                i = j + 1
+    except KeyError:
+        raise ValueError("Not a valid koremutake string.")
     return num
+
 
 class TestKoremutake(unittest.TestCase):
     def test_encode(self):
@@ -48,6 +51,7 @@ class TestKoremutake(unittest.TestCase):
         self.assertEqual(encode(128**3), "bebababa")
         self.assertEqual(encode(128**3 - 1), "tretretre")
         self.assertEqual(encode(10610353957), "koremutake")
+        self.assertEqual(encode(4398046511103), "tretretretretretre")
 
     def test_encode_padded(self):
         self.assertEqual(encode(0, 2), "baba")
@@ -66,6 +70,7 @@ class TestKoremutake(unittest.TestCase):
         self.assertEqual(decode("bebababa"), 128**3)
         self.assertEqual(decode("tretretre"), 128**3 - 1)
         self.assertEqual(decode("koremutake"), 10610353957)
+        self.assertEqual(decode("tretretretretretre"), 4398046511103)
         self.assertEqual(decode("baba"), 0)
         self.assertEqual(decode("bababababa"), 0)
         self.assertEqual(decode("babatre"), 127)
