@@ -13,22 +13,26 @@ _syllables = [c + v for c in _consonants for v in _vowels][:128]
 _revmap = dict([(v, k) for (k, v) in enumerate(_syllables)])
 
 def encode(num, syllables=None):
-    """Converts a number to a koremutake string.
+    """Convert an integer to a koremutake string.
     If the syllables argument is given, the resulting string is at
     least that many syllables."""
     if num < 0:
         raise ValueError("Argument must be a positive number")
+
     parts = []
     if num == 0:
         parts.insert(0, _syllables[0])
     while num:
         parts.insert(0, _syllables[num & 127])
         num = num >> 7
+
+    # Pad to minimum number of syllables
     if syllables is not None and len(parts) < syllables:
         parts[0:0] = [_syllables[0]] * (syllables - len(parts))
     return ''.join(parts)
 
 def decode(string):
+    """Convert a koremutake string to an integer."""
     num = 0
     i = 0
     try:
@@ -38,8 +42,10 @@ def decode(string):
                 num += _revmap[string[i:j+1]]
                 i = j + 1
         if i != j + 1:
+            # There was crap at the end of the string
             raise ValueError("Not a valid koreutake string.")
     except KeyError:
+        # An invalid vowel was found
         raise ValueError("Not a valid koremutake string.")
     return num
 
