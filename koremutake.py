@@ -15,8 +15,9 @@ def encode(num, syllables=None):
     least that many syllables."""
     if num < 0:
         raise TypeError("Argument must be a positive number")
-    if num == 0: return _syllables[0]
     parts = []
+    if num == 0:
+        parts.append(_syllables[0])
     while num:
         num, remainder = divmod(num, 128)
         parts.append(_syllables[remainder])
@@ -36,6 +37,11 @@ class TestKoremutake(unittest.TestCase):
         self.assertEqual(encode(128**3), "bebababa")
         self.assertEqual(encode(128**3 - 1), "tretretre")
 
+    def test_encode_padded(self):
+        self.assertEqual(encode(0, 2), "baba")
+        self.assertEqual(encode(0, 5), "bababababa")
+        self.assertEqual(encode(127, 3), "babatre")
+        self.assertEqual(encode(128**3, 1), "bebababa")
 
 
 if __name__ == "__main__":
