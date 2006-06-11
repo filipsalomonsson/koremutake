@@ -29,7 +29,7 @@ def encode(num, syllables=None):
 _koremutake_re = re.compile(r"^(%s)+$" % "|".join(_syllables))
 _syllable_re = re.compile(r"(%s)" % "|".join(_syllables))
 def decode(s):
-    if not _syllable_re.match(s):
+    if not _koremutake_re.match(s):
         raise ValueError("Argument is not a valid koremutake string.")
     num = 0
     for syllable in _syllable_re.findall(s):
