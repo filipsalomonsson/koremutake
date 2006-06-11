@@ -9,9 +9,16 @@ vowels = "aeiouy"
 consonants = list("bdfghjklmnprstv") + "br dr fr gr pr st tr".split()
 syllables = [c + v for c in consonants for v in vowels][:128]
 
-def encode(n):
+def encode(num):
     """Converts a number to a koremutake string."""
-    return syllables[n]
+    if num < 0:
+        raise TypeError("Argument must be a positive number")
+    if num == 0: return syllables[0]
+    parts = []
+    while num:
+        num, remainder = divmod(num, 128)
+        parts.append(syllables[remainder])
+    return ''.join(reversed(parts))
 
 class TestKoremutake(unittest.TestCase):
     def test_encode(self):
