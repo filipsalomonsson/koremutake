@@ -7,7 +7,7 @@ __date__ = "2006-06-11"
 
 _vowels = "aeiouy"
 _consonants = list("bdfghjklmnprstv") + "br dr fr gr pr st tr".split()
-_syllables = [c + v for c in consonants for v in vowels][:128]
+_syllables = [c + v for c in _consonants for v in _vowels][:128]
 
 def encode(num, syllables=None):
     """Converts a number to a koremutake string.
@@ -15,7 +15,7 @@ def encode(num, syllables=None):
     least that many syllables."""
     if num < 0:
         raise TypeError("Argument must be a positive number")
-    if num == 0: return syllables[0]
+    if num == 0: return _syllables[0]
     parts = []
     while num:
         num, remainder = divmod(num, 128)
@@ -29,6 +29,14 @@ class TestKoremutake(unittest.TestCase):
     def test_encode(self):
         self.assertEqual(encode(0), "ba")
         self.assertEqual(encode(127), "tre")
-                         
+        self.assertEqual(encode(128), "beba")
+        self.assertEqual(encode(256), "biba")
+        self.assertEqual(encode(128**2), "bebaba")
+        self.assertEqual(encode(128**2 - 1), "tretre")
+        self.assertEqual(encode(128**3), "bebababa")
+        self.assertEqual(encode(128**3 - 1), "tretretre")
+
+
+
 if __name__ == "__main__":
     unittest.main()
