@@ -48,6 +48,7 @@ class TestKoremutake(unittest.TestCase):
         self.assertEqual(encode(128**2 - 1), "tretre")
         self.assertEqual(encode(128**3), "bebababa")
         self.assertEqual(encode(128**3 - 1), "tretretre")
+        self.assertEqual(encode(10610353957), "koremutake")
 
     def test_encode_padded(self):
         self.assertEqual(encode(0, 2), "baba")
@@ -65,6 +66,7 @@ class TestKoremutake(unittest.TestCase):
         self.assertEqual(decode("tretre"), 128**2 - 1)
         self.assertEqual(decode("bebababa"), 128**3)
         self.assertEqual(decode("tretretre"), 128**3 - 1)
+        self.assertEqual(decode("koremutake"), 10610353957)
         self.assertEqual(decode("baba"), 0)
         self.assertEqual(decode("bababababa"), 0)
         self.assertEqual(decode("babatre"), 127)
