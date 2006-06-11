@@ -15,7 +15,7 @@ def encode(num, syllables=None):
     If the syllables argument is given, the resulting string is at
     least that many syllables."""
     if num < 0:
-        raise TypeError("Argument must be a positive number")
+        raise ValueError("Argument must be a positive number")
     parts = []
     if num == 0:
         parts.append(_syllables[0])
