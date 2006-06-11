@@ -5,19 +5,24 @@ import unittest
 __author__ = "Filip Salomonsson (filip@infix.se)"
 __date__ = "2006-06-11"
 
-vowels = "aeiouy"
-consonants = list("bdfghjklmnprstv") + "br dr fr gr pr st tr".split()
-syllables = [c + v for c in consonants for v in vowels][:128]
+_vowels = "aeiouy"
+_consonants = list("bdfghjklmnprstv") + "br dr fr gr pr st tr".split()
+_syllables = [c + v for c in consonants for v in vowels][:128]
 
-def encode(num):
-    """Converts a number to a koremutake string."""
+def encode(num, syllables=None):
+    """Converts a number to a koremutake string.
+    If the syllables argument is given, the resulting string is at
+    least that many syllables."""
     if num < 0:
         raise TypeError("Argument must be a positive number")
     if num == 0: return syllables[0]
     parts = []
     while num:
         num, remainder = divmod(num, 128)
-        parts.append(syllables[remainder])
+        parts.append(_syllables[remainder])
+
+    if syllables is not None and len(parts) < syllables:
+        parts.extend([_syllables[0]] * (syllables - len(parts)))
     return ''.join(reversed(parts))
 
 class TestKoremutake(unittest.TestCase):
