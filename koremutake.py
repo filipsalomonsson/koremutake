@@ -5,6 +5,8 @@ import unittest
 __author__ = "Filip Salomonsson (filip@infix.se)"
 __date__ = "2006-06-11"
 
+__all__ = ['encode', 'decode']
+
 _vowels = "aeiouy"
 _consonants = list("bdfghjklmnprstv") + "br dr fr gr pr st tr".split()
 _syllables = [c + v for c in _consonants for v in _vowels][:128]
@@ -18,7 +20,7 @@ def encode(num, syllables=None):
         raise ValueError("Argument must be a positive number")
     parts = []
     if num == 0:
-        parts.append(_syllables[0])
+        parts.insert(0, _syllables[0])
     while num:
         parts.insert(0, _syllables[num & 127])
         num = num >> 7
@@ -35,6 +37,8 @@ def decode(string):
                 num <<= 7
                 num += _revmap[string[i:j+1]]
                 i = j + 1
+        if i != j + 1:
+            raise ValueError("Not a valid koreutake string.")
     except KeyError:
         raise ValueError("Not a valid koremutake string.")
     return num
@@ -52,6 +56,9 @@ class TestKoremutake(unittest.TestCase):
         self.assertEqual(encode(128**3 - 1), "tretretre")
         self.assertEqual(encode(10610353957), "koremutake")
         self.assertEqual(encode(4398046511103), "tretretretretretre")
+
+        # Negative numbers can't be converted
+        self.assertRaises(ValueError, encode, -1)
 
     def test_encode_padded(self):
         self.assertEqual(encode(0, 2), "baba")
@@ -73,6 +80,11 @@ class TestKoremutake(unittest.TestCase):
         self.assertEqual(decode("baba"), 0)
         self.assertEqual(decode("bababababa"), 0)
         self.assertEqual(decode("babatre"), 127)
+
+        # Invalid koremutake strings
+        self.assertRaises(ValueError, decode, "foo")
+        self.assertRaises(ValueError, decode, "kooremutake")
+        self.assertRaises(ValueError, decode, "bab")
 
 if __name__ == "__main__":
     unittest.main()
